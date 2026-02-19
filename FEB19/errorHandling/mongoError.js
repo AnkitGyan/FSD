@@ -1,19 +1,27 @@
-const promise = require('promise');
-const MongoClient = require('mongodb').MongoClient;
+const { MongoClient } = require('mongodb');
 
-const url = 'mongodb://localhost/TestDB';
+const url = 'mongodb://localhost:27017';
+const dbName = 'TestDB';
 
-MongoClient.connect(url)
-   .then(function(err, db){
-    db.collection('Test').updateOne({name: 'John'}, {$set: {age: 30}})
-    .then(function(result){
+async function updateUser() {
+    const client = new MongoClient(url);
+
+    try {
+        await client.connect();
+        console.log("Connected to MongoDB");
+
+        const db = client.db(dbName);
+        const result = await db.collection('Test').updateOne(
+            { name: 'John' },
+            { $set: { age: 30 } }
+        );
+
         console.log(result);
-    })
-    .catch(function(err){
+    } catch (err) {
         console.log(err);
-    })  
-   })
+    } finally {
+        await client.close();
+    }
+}
 
-    .catch(function(err){
-        console.log(err);
-    })  
+updateUser();
